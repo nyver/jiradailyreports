@@ -37,7 +37,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.nyver.jira.JiraDailyReports</mainClass>
+                            <mainClass>com.nyver.jira.jiradailyreports.JiraDailyReports</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
