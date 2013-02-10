@@ -2,6 +2,7 @@ package com.nyver.jira.jiradailyreports;
 
 import com.atlassian.jira.rest.client.JiraRestClient;
 import com.atlassian.jira.rest.client.NullProgressMonitor;
+import com.atlassian.jira.rest.client.RestClientException;
 import com.atlassian.jira.rest.client.domain.BasicIssue;
 import com.atlassian.jira.rest.client.domain.Issue;
 import com.atlassian.jira.rest.client.domain.SearchResult;
@@ -52,10 +53,9 @@ public class JiraDailyReportBuilder
     /**
      * Build report
      */
-    public void build()
+    public void build() throws RestClientException
     {
         final NullProgressMonitor pm = new NullProgressMonitor();
-
 
         // What was done
         output.writeLn("What was done:");

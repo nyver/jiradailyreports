@@ -1,12 +1,16 @@
 package com.nyver.jira.jiradailyreports;
 
 import com.atlassian.jira.rest.client.JiraRestClient;
+import com.atlassian.jira.rest.client.RestClientException;
 import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactory;
 import com.nyver.jira.jiradailyreports.output.Console;
 import org.apache.commons.cli.*;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * Main class
@@ -28,33 +32,37 @@ public class JiraDailyReports
 
         System.out.println("Jira Daily Reports " + VERSION);
 
+        options = getOptions();
+
         try {
-            options = getOptions();
             line = parseArguments(args, options);
+
+            validateOptions(line);
 
             login = line.getOptionValue(OPTION_NAME_LOGIN);
 
-            if (isOptionsValid(line)) {
-                JiraDailyReportBuilder builder = new JiraDailyReportBuilder(
-                        getJiraRestClient(
-                                line.getOptionValue(OPTION_NAME_URL),
-                                login,
-                                line.getOptionValue(OPTION_NAME_PASSWORD)
-                        ),
-                        new Console()
-                );
-                builder.setUser(login);
-                builder.build();
-            } else {
-                // Automatically generate the help statement
-                HelpFormatter formatter = new HelpFormatter();
-                formatter.printHelp("jiradailyreports", options);
-            }
-
+            JiraDailyReportBuilder builder = new JiraDailyReportBuilder(
+                    getJiraRestClient(
+                            line.getOptionValue(OPTION_NAME_URL),
+                            login,
+                            line.getOptionValue(OPTION_NAME_PASSWORD)
+                    ),
+                    new Console()
+            );
+            builder.setUser(login);
+            builder.build();
         } catch (ParseException e) {
             System.out.println("Parsing of command line arguments failed: " + e.getMessage());
         } catch (URISyntaxException e) {
             System.out.println("URL syntax exception: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid argument: " + e.getMessage());
+
+            // Automatically generate the help statement
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("jiradailyreports", options);
+        } catch (RestClientException e) {
+            System.out.println("Jira Rest client exception: " + e.getMessage());
         }
     }
 
@@ -105,12 +113,42 @@ public class JiraDailyReports
      * @param line
      * @return true if options is valid
      */
-    private static boolean isOptionsValid(CommandLine line)
+    private static boolean validateOptions(CommandLine line)
     {
-        if (!line.hasOption(OPTION_NAME_URL)
-                || !line.hasOption(OPTION_NAME_LOGIN)
-                || !line.hasOption(OPTION_NAME_PASSWORD)) {
-            return false;
+        if (!line.hasOption(OPTION_NAME_URL)) {
+            throw new IllegalArgumentException(String.format("Parameter $s is not exists", OPTION_NAME_URL));
+        }
+        if (!line.hasOption(OPTION_NAME_LOGIN)) {
+            throw new IllegalArgumentException(String.format("Parameter $s is not exists", OPTION_NAME_LOGIN));
+        }
+        if (!line.hasOption(OPTION_NAME_PASSWORD)) {
+            throw new IllegalArgumentException(String.format("Parameter $s is not exists", OPTION_NAME_PASSWORD));
+        }
+
+        String url = line.getOptionValue(OPTION_NAME_URL);
+        String login = line.getOptionValue(OPTION_NAME_LOGIN);
+        String password = line.getOptionValue(OPTION_NAME_PASSWORD);
+
+        if (url.isEmpty()) {
+            throw new IllegalArgumentException("Url can not be empty");
+        }
+
+        // Check for availability url
+        final URLConnection connection;
+
+        try {
+            connection = new URL(url).openConnection();
+            connection.connect();
+        } catch (IOException e) {
+            throw new IllegalArgumentException(String.format("Can not connect to url \"%s\"", url));
+        }
+
+        if (login.isEmpty()) {
+            throw new IllegalArgumentException("Login can not be empty");
+        }
+
+        if (password.isEmpty()) {
+            throw new IllegalArgumentException("Password can not be empty");
         }
 
         return true;
