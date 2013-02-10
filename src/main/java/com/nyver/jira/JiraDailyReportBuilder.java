@@ -77,7 +77,7 @@ public class JiraDailyReportBuilder
      * @param jql
      * @param pm
      */
-    protected void executeJql(String jql, final NullProgressMonitor pm)
+    protected void executeJql(String jql, NullProgressMonitor pm)
     {
         SearchResult result = client.getSearchClient().searchJql(
                 jql,

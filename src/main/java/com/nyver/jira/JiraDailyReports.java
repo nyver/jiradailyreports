@@ -116,14 +116,14 @@ public class JiraDailyReports
 
     /**
      * Get Jira Rest API Client
-     * @param host
+     * @param url
      * @param login
      * @param password
      * @return
      * @throws URISyntaxException
      */
-    private static JiraRestClient getJiraRestClient(String host, String login, String password) throws URISyntaxException {
+    private static JiraRestClient getJiraRestClient(String url, String login, String password) throws URISyntaxException {
         final JerseyJiraRestClientFactory factory = new JerseyJiraRestClientFactory();
-        return factory.createWithBasicHttpAuthentication(new URI(host), login, password);
+        return factory.createWithBasicHttpAuthentication(new URI(url), login, password);
     }
 }
