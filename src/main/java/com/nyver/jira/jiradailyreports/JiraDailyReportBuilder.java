@@ -7,7 +7,6 @@ import com.atlassian.jira.rest.client.domain.BasicIssue;
 import com.atlassian.jira.rest.client.domain.Issue;
 import com.atlassian.jira.rest.client.domain.SearchResult;
 import com.nyver.jira.jiradailyreports.output.OutputInterface;
-import sun.util.resources.CalendarData_el;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
