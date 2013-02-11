@@ -62,7 +62,7 @@ public class JiraDailyReportBuilder
         final NullProgressMonitor pm = new NullProgressMonitor();
 
         // What was done
-        output.writeLn("What was done:");
+        output.writeHeader("What was done:");
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -79,7 +79,7 @@ public class JiraDailyReportBuilder
         );
 
         // What's next
-        output.writeLn("What's next:");
+        output.writeHeader("What's next:");
 
         executeJql(
                 String.format("assignee in (\"%s\") AND status in (Open, \"In Progress\", Reopened) ORDER BY priority DESC", user),
@@ -103,9 +103,7 @@ public class JiraDailyReportBuilder
         if (result.getTotal() > 0) {
             for(BasicIssue basicIssue: result.getIssues()) {
                 Issue issue = client.getIssueClient().getIssue(basicIssue.getKey(), pm);
-                output.writeLn(
-                        String.format("[%s] %s (%s)", issue.getKey(), issue.getSummary(), issue.getStatus().getName())
-                );
+                output.writeIssue(issue);
             }
         }
     }

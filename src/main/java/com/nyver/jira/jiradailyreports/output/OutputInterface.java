@@ -1,5 +1,7 @@
 package com.nyver.jira.jiradailyreports.output;
 
+import com.atlassian.jira.rest.client.domain.Issue;
+
 /**
  * Output adapter interface
  *
@@ -7,5 +9,15 @@ package com.nyver.jira.jiradailyreports.output;
  */
 public interface OutputInterface
 {
-    public void writeLn(String str);
+    /**
+     * Write header to output
+     * @param str header
+     */
+    public void writeHeader(String str);
+
+    /**
+     * Write information about issue
+     * @param issue current issue
+     */
+    public void writeIssue(Issue issue);
 }
