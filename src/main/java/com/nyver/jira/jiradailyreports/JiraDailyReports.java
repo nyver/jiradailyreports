@@ -4,6 +4,8 @@ import com.atlassian.jira.rest.client.JiraRestClient;
 import com.atlassian.jira.rest.client.RestClientException;
 import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactory;
 import com.nyver.jira.jiradailyreports.output.Console;
+import com.nyver.jira.jiradailyreports.output.OutputInterface;
+import com.nyver.jira.jiradailyreports.output.Wiki;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
@@ -23,6 +25,10 @@ public class JiraDailyReports
     private static String OPTION_NAME_URL      = "url";
     private static String OPTION_NAME_LOGIN    = "login";
     private static String OPTION_NAME_PASSWORD = "password";
+    private static String OPTION_NAME_OUTPUT    = "output";
+
+    private static String OUTPUT_CONSOLE = "console";
+    private static String OUTPUT_WIKI    = "wiki";
 
     public static void main(String[] args)
     {
@@ -47,7 +53,7 @@ public class JiraDailyReports
                             login,
                             line.getOptionValue(OPTION_NAME_PASSWORD)
                     ),
-                    new Console()
+                    getOutput(line)
             );
             builder.setUser(login);
             builder.build();
@@ -91,6 +97,12 @@ public class JiraDailyReports
                         .hasArg()
                         .withDescription("Jira user password")
                         .create(OPTION_NAME_PASSWORD)
+        );
+        options.addOption(
+                OptionBuilder.withArgName("OUTPUT")
+                        .hasOptionalArg()
+                        .withDescription("Output: console (default), wiki")
+                        .create(OPTION_NAME_OUTPUT)
         );
 
         return options;
@@ -152,6 +164,25 @@ public class JiraDailyReports
         }
 
         return true;
+    }
+
+    /**
+     * Get output
+     * @param line
+     * @return
+     */
+    public static OutputInterface getOutput(CommandLine line)
+    {
+        OutputInterface output = new Console();
+
+        if (line.hasOption(OPTION_NAME_OUTPUT)) {
+            String outputFormat = line.getOptionValue(OPTION_NAME_OUTPUT);
+            if (outputFormat.toLowerCase().equals(OUTPUT_WIKI)) {
+                output = new Wiki();
+            }
+        }
+
+        return output;
     }
 
     /**
