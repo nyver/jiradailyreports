@@ -6,6 +6,7 @@ import com.atlassian.jira.rest.client.RestClientException;
 import com.atlassian.jira.rest.client.domain.BasicIssue;
 import com.atlassian.jira.rest.client.domain.Issue;
 import com.atlassian.jira.rest.client.domain.SearchResult;
+import com.atlassian.jira.rest.client.domain.Worklog;
 import com.nyver.jira.jiradailyreports.output.OutputInterface;
 
 import java.text.DateFormat;
@@ -46,6 +47,11 @@ public class JiraDailyReportBuilder
     protected Date getYesterdayDate()
     {
         Calendar cal = Calendar.getInstance();
+
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+
         if (Calendar.MONDAY == cal.get(Calendar.DAY_OF_WEEK)) {
             cal.add(Calendar.DATE, -3);
         } else {
@@ -53,6 +59,22 @@ public class JiraDailyReportBuilder
         }
         return cal.getTime();
     }
+
+    /**
+     * Get today date
+     * @return
+     */
+    protected Date getTodayDate()
+    {
+        Calendar cal = Calendar.getInstance();
+
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+
+        return cal.getTime();
+    }
+
 
     /**
      * Build report
@@ -66,17 +88,35 @@ public class JiraDailyReportBuilder
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        executeJql(
-                String.format(
-                        "updatedDate < \"%s\" AND updatedDate > \"%s\" AND assignee CHANGED FROM \"%s\" ON \"%s\" AND assignee != \"%s\" ORDER BY priority DESC",
-                        dateFormat.format(new Date()),
-                        dateFormat.format(getYesterdayDate()),
-                        user,
-                        dateFormat.format(getYesterdayDate()),
-                        user
-                ),
-                pm
+        Date yesterdayDate = getYesterdayDate();
+        Date todayDate = getTodayDate();
+
+        SearchResult result = client.getSearchClient().searchJql(
+            String.format(
+                    "updatedDate > \"%s\" AND updatedDate < \"%s\" AND (assignee WAS \"%s\" ON \"%s\" OR assignee = \"%s\") ORDER BY priority DESC",
+                    dateFormat.format(yesterdayDate),
+                    dateFormat.format(todayDate),
+                    user,
+                    dateFormat.format(getYesterdayDate()),
+                    user
+            ),
+            pm
         );
+
+        if (result.getTotal() > 0) {
+            for(BasicIssue basicIssue: result.getIssues()) {
+                Issue issue = client.getIssueClient().getIssue(basicIssue.getKey(), pm);
+                for(Worklog worklog: issue.getWorklogs()) {
+                    if (worklog.getCreationDate().isAfter(yesterdayDate.getTime())
+                            && worklog.getCreationDate().isBefore(todayDate.getTime())
+                            && worklog.getAuthor().getName().equals(user)
+                            ) {
+                        output.writeIssue(issue);
+                        break;
+                    }
+                }
+            }
+        }
 
         // What's next
         output.writeHeader("What's next:");
