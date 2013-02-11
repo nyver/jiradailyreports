@@ -7,6 +7,7 @@ import com.atlassian.jira.rest.client.domain.BasicIssue;
 import com.atlassian.jira.rest.client.domain.Issue;
 import com.atlassian.jira.rest.client.domain.SearchResult;
 import com.nyver.jira.jiradailyreports.output.OutputInterface;
+import sun.util.resources.CalendarData_el;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -46,7 +47,11 @@ public class JiraDailyReportBuilder
     protected Date getYesterdayDate()
     {
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
+        if (Calendar.MONDAY == cal.get(Calendar.DAY_OF_WEEK)) {
+            cal.add(Calendar.DATE, -3);
+        } else {
+            cal.add(Calendar.DATE, -1);
+        }
         return cal.getTime();
     }
 
@@ -64,10 +69,11 @@ public class JiraDailyReportBuilder
 
         executeJql(
                 String.format(
-                        "updatedDate < \"%s\" AND updatedDate > \"%s\" AND assignee CHANGED FROM \"%s\" AND assignee != \"%s\" ORDER BY priority DESC",
+                        "updatedDate < \"%s\" AND updatedDate > \"%s\" AND assignee CHANGED FROM \"%s\" ON \"%s\" AND assignee != \"%s\" ORDER BY priority DESC",
                         dateFormat.format(new Date()),
                         dateFormat.format(getYesterdayDate()),
                         user,
+                        dateFormat.format(getYesterdayDate()),
                         user
                 ),
                 pm
