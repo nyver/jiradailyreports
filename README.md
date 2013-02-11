@@ -13,4 +13,4 @@ use only Maven 2, not Maven 3
 
 USAGE
 =================
-java -jar <jar_file> -url <jira url> -login <jira user login> -password <jira user password> [-user <jira user for which the report>] [-output <console|wiki>]
+java -jar jar_file -url jira_url -login jira_user_login -password jira_user_password [-user_jira_user_for_which_the_report] [-output console|wiki]
