@@ -23,20 +23,21 @@ public class JiraDailyReports
     private static String VERSION = "1.0";
 
     private static String OPTION_NAME_URL      = "url";
+    private static String OPTION_NAME_USER     = "user";
     private static String OPTION_NAME_LOGIN    = "login";
     private static String OPTION_NAME_PASSWORD = "password";
-    private static String OPTION_NAME_OUTPUT    = "output";
+    private static String OPTION_NAME_OUTPUT   = "output";
 
     private static String OUTPUT_CONSOLE = "console";
     private static String OUTPUT_WIKI    = "wiki";
 
     public static void main(String[] args)
     {
-        String login;
         CommandLine line;
         Options options;
 
         System.out.println("Jira Daily Reports " + VERSION);
+        System.out.println();
 
         options = getOptions();
 
@@ -45,17 +46,15 @@ public class JiraDailyReports
 
             validateOptions(line);
 
-            login = line.getOptionValue(OPTION_NAME_LOGIN);
-
             JiraDailyReportBuilder builder = new JiraDailyReportBuilder(
                     getJiraRestClient(
                             line.getOptionValue(OPTION_NAME_URL),
-                            login,
+                            line.getOptionValue(OPTION_NAME_LOGIN),
                             line.getOptionValue(OPTION_NAME_PASSWORD)
                     ),
                     getOutput(line)
             );
-            builder.setUser(login);
+            builder.setUser(getUser(line));
             builder.build();
         } catch (ParseException e) {
             System.out.println("Parsing of command line arguments failed: " + e.getMessage());
@@ -69,6 +68,8 @@ public class JiraDailyReports
             formatter.printHelp("jiradailyreports", options);
         } catch (RestClientException e) {
             System.out.println("Jira Rest client exception: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Unknown exception: " + e.getMessage());
         }
     }
 
@@ -97,6 +98,12 @@ public class JiraDailyReports
                         .hasArg()
                         .withDescription("Jira user password")
                         .create(OPTION_NAME_PASSWORD)
+        );
+        options.addOption(
+                OptionBuilder.withArgName("USER")
+                        .hasOptionalArg()
+                        .withDescription("User name for which the report")
+                        .create(OPTION_NAME_USER)
         );
         options.addOption(
                 OptionBuilder.withArgName("OUTPUT")
@@ -183,6 +190,20 @@ public class JiraDailyReports
         }
 
         return output;
+    }
+
+    /**
+     * Get user name for the report
+     * @param line
+     * @return
+     */
+    public static String getUser(CommandLine line)
+    {
+        String user = line.getOptionValue(OPTION_NAME_LOGIN);
+        if (line.hasOption(OPTION_NAME_USER)) {
+            user = line.getOptionValue(OPTION_NAME_USER);
+        }
+        return user;
     }
 
     /**

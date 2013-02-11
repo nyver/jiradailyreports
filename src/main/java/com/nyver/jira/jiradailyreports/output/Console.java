@@ -13,6 +13,10 @@ public class Console implements OutputInterface {
         System.out.println(str);
     }
 
+    public void writeString(String str) {
+        System.out.println(str);
+    }
+
     public void writeIssue(Issue issue) {
         System.out.println(
                 String.format(

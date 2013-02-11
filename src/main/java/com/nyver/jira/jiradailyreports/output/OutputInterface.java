@@ -16,6 +16,12 @@ public interface OutputInterface
     public void writeHeader(String str);
 
     /**
+     * Write string to output
+     * @param str
+     */
+    public void writeString(String str);
+
+    /**
      * Write information about issue
      * @param issue current issue
      */

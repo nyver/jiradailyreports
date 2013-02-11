@@ -83,6 +83,9 @@ public class JiraDailyReportBuilder
     {
         final NullProgressMonitor pm = new NullProgressMonitor();
 
+        output.writeString(String.format("Jira daily report for %s (%s)", user, new Date()));
+        output.writeString("");
+
         // What was done
         output.writeHeader("What was done:");
 
