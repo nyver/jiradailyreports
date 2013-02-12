@@ -16,6 +16,10 @@ public class Wiki implements Output {
         System.out.println(str);
     }
 
+    public String getName() {
+        return "Wiki";
+    }
+
     public void writeIssue(Issue issue) {
         System.out.println(
                 String.format(

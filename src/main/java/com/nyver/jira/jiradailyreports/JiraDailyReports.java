@@ -13,6 +13,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.ServiceLoader;
 
 /**
  * Main class
@@ -30,6 +32,10 @@ public class JiraDailyReports
 
     private static String OUTPUT_CONSOLE = "console";
     private static String OUTPUT_WIKI    = "wiki";
+
+    private static HashMap<String, Output> outputs = new HashMap<String, Output>();
+
+    private static Output output = new Console();
 
     public static void main(String[] args)
     {
@@ -173,19 +179,27 @@ public class JiraDailyReports
         return true;
     }
 
+    private static void initOutputs()
+    {
+        ServiceLoader<Output> printersSet = ServiceLoader.load(Output.class);
+        for (Output output : printersSet) {
+            outputs.put(output.getName().toLowerCase(), output);
+        }
+    }
+
     /**
      * Get output
      * @param line
      * @return
      */
-    public static Output getOutput(CommandLine line)
+    private static Output getOutput(CommandLine line)
     {
-        Output output = new Console();
+        initOutputs();
 
         if (line.hasOption(OPTION_NAME_OUTPUT)) {
-            String outputFormat = line.getOptionValue(OPTION_NAME_OUTPUT);
-            if (outputFormat.toLowerCase().equals(OUTPUT_WIKI)) {
-                output = new Wiki();
+            String outputFormat = line.getOptionValue(OPTION_NAME_OUTPUT).toLowerCase();
+            if (outputs.containsKey(outputFormat)) {
+                output = outputs.get(outputFormat);
             }
         }
 
@@ -197,7 +211,7 @@ public class JiraDailyReports
      * @param line
      * @return
      */
-    public static String getUser(CommandLine line)
+    private static String getUser(CommandLine line)
     {
         String user = line.getOptionValue(OPTION_NAME_LOGIN);
         if (line.hasOption(OPTION_NAME_USER)) {

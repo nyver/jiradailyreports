@@ -26,4 +26,10 @@ public interface Output
      * @param issue current issue
      */
     public void writeIssue(Issue issue);
+
+    /**
+     * Get name of output
+     * @return
+     */
+    public String getName();
 }
