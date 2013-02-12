@@ -83,20 +83,20 @@ public class JiraDailyReportBuilder
     {
         final NullProgressMonitor pm = new NullProgressMonitor();
 
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        Date yesterdayDate = getYesterdayDate();
+        Date todayDate = getTodayDate();
+
         output.writeString(String.format("Jira daily report for %s (%s)", user, new Date()));
         output.writeString("");
 
         // What was done
         output.writeHeader("What was done:");
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        Date yesterdayDate = getYesterdayDate();
-        Date todayDate = getTodayDate();
-
         SearchResult result = client.getSearchClient().searchJql(
             String.format(
-                    "updatedDate > \"%s\" AND updatedDate < \"%s\" AND (assignee WAS \"%s\" ON \"%s\" OR assignee = \"%s\") ORDER BY priority DESC",
+                    "updatedDate >= \"%s\" AND updatedDate <= \"%s\" AND (assignee WAS \"%s\" ON \"%s\" OR assignee = \"%s\") ORDER BY priority DESC",
                     dateFormat.format(yesterdayDate),
                     dateFormat.format(todayDate),
                     user,
@@ -110,13 +110,13 @@ public class JiraDailyReportBuilder
             for(BasicIssue basicIssue: result.getIssues()) {
                 Issue issue = client.getIssueClient().getIssue(basicIssue.getKey(), pm);
                 for(Worklog worklog: issue.getWorklogs()) {
-                    if (worklog.getCreationDate().isAfter(yesterdayDate.getTime())
-                            && worklog.getCreationDate().isBefore(todayDate.getTime())
+                    if (dateFormat.format(worklog.getCreationDate().toDate()).equals(dateFormat.format(yesterdayDate))
                             && worklog.getAuthor().getName().equals(user)
                             ) {
                         output.writeIssue(issue);
                         break;
                     }
+
                 }
             }
         }
