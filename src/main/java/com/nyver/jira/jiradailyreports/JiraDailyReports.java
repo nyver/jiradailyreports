@@ -4,7 +4,7 @@ import com.atlassian.jira.rest.client.JiraRestClient;
 import com.atlassian.jira.rest.client.RestClientException;
 import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactory;
 import com.nyver.jira.jiradailyreports.output.Console;
-import com.nyver.jira.jiradailyreports.output.OutputInterface;
+import com.nyver.jira.jiradailyreports.output.Output;
 import com.nyver.jira.jiradailyreports.output.Wiki;
 import org.apache.commons.cli.*;
 
@@ -178,9 +178,9 @@ public class JiraDailyReports
      * @param line
      * @return
      */
-    public static OutputInterface getOutput(CommandLine line)
+    public static Output getOutput(CommandLine line)
     {
-        OutputInterface output = new Console();
+        Output output = new Console();
 
         if (line.hasOption(OPTION_NAME_OUTPUT)) {
             String outputFormat = line.getOptionValue(OPTION_NAME_OUTPUT);

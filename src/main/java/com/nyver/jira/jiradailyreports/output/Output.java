@@ -7,7 +7,7 @@ import com.atlassian.jira.rest.client.domain.Issue;
  *
  * @author Yuri Novitsky
  */
-public interface OutputInterface
+public interface Output
 {
     /**
      * Write header to output

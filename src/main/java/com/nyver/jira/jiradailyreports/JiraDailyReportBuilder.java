@@ -7,7 +7,7 @@ import com.atlassian.jira.rest.client.domain.BasicIssue;
 import com.atlassian.jira.rest.client.domain.Issue;
 import com.atlassian.jira.rest.client.domain.SearchResult;
 import com.atlassian.jira.rest.client.domain.Worklog;
-import com.nyver.jira.jiradailyreports.output.OutputInterface;
+import com.nyver.jira.jiradailyreports.output.Output;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -22,10 +22,10 @@ import java.util.Date;
 public class JiraDailyReportBuilder
 {
     private JiraRestClient client;
-    private OutputInterface output;
+    private Output output;
     private String user;
 
-    public JiraDailyReportBuilder(JiraRestClient client, OutputInterface output)
+    public JiraDailyReportBuilder(JiraRestClient client, Output output)
     {
         this.client = client;
         this.output = output;

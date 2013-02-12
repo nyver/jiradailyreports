@@ -7,7 +7,7 @@ import com.atlassian.jira.rest.client.domain.Issue;
  *
  * @author Yuri Novitsky
  */
-public class Console implements OutputInterface {
+public class Console implements Output {
 
     public void writeHeader(String str) {
         System.out.println(str);

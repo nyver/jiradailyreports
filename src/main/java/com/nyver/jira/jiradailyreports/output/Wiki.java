@@ -7,7 +7,7 @@ import com.atlassian.jira.rest.client.domain.Issue;
  *
  * @author Yuri Novitsky
  */
-public class Wiki implements OutputInterface {
+public class Wiki implements Output {
     public void writeHeader(String str) {
         System.out.println("==" + str + "==");
     }
